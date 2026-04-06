@@ -1,0 +1,53 @@
+name: Redis service container (entrypoint + command demo)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  demo:
+    runs-on: ubuntu-latest
+
+    services:
+      redis:
+        image: redis:7.2-alpine
+
+        # NEW: native overrides for service containers (April 2026)
+        # - entrypoint overrides the image ENTRYPOINT
+        # - command overrides the image CMD
+        entrypoint: ["docker-entrypoint.sh"]
+        command:
+          [
+            "redis-server",
+            "--requirepass", "demo-password",
+            "--appendonly", "yes",
+            "--maxmemory-policy", "allkeys-lru"
+          ]
+
+        ports:
+          - 6379:6379
+
+        # Health check waits until the service is ready
+        options: >-
+          --health-cmd "redis-cli -a demo-password ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Smoke test Redis (prove config + auth)
+        env:
+          REDIS_URL: redis://:demo-password@localhost:6379
+        run: node scripts/
