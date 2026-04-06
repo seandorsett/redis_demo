@@ -17,14 +17,8 @@ jobs:
         # NEW: native overrides for service containers (April 2026)
         # - entrypoint overrides the image ENTRYPOINT
         # - command overrides the image CMD
-        entrypoint: ["docker-entrypoint.sh"]
-        command:
-          [
-            "redis-server",
-            "--requirepass", "demo-password",
-            "--appendonly", "yes",
-            "--maxmemory-policy", "allkeys-lru"
-          ]
+        entrypoint: docker-entrypoint.sh
+        command: redis-server --requirepass demo-password --appendonly yes --maxmemory-policy allkeys-lru
 
         ports:
           - 6379:6379
@@ -51,4 +45,4 @@ jobs:
       - name: Smoke test Redis (prove config + auth)
         env:
           REDIS_URL: redis://:demo-password@localhost:6379
-        run: node scripts/
+        run: node scripts/redis-smoke.js
