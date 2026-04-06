@@ -1,1 +1,12 @@
-
+{
+  "name": "redis-entrypoint-actions-demo",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Demo Redis service container with entrypoint/command overrides in GitHub Actions",
+  "scripts": {
+    "smoke": "node scripts/redis-smoke.js"
+  },
+  "dependencies": {
+    "redis": "^4.6.13"
+  }
+}
